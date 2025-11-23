@@ -94,13 +94,61 @@
       .next-blind, .timer-small{width:100%}
       .overlay-open-btn{ right:12px; top:12px; }
     }
+
+.timer-large {
+  width: 100%;
+  text-align: center;
+  padding: 24px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  border: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 20px; /* spacing below timer */
+}
+
+.timer-large .label {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.countdown-large {
+  font-size: 64px;   /* enlarged countdown */
+  font-weight: 900;
+  margin: 12px 0;
+  letter-spacing: 2px;
+}
+
+#zoom-in-btn, #zoom-out-btn {
+  min-width: 100px;
+}
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card timer-card" id="timer-area">
-      <button class="overlay-open-btn btn" id="open-structure">Structure</button>
+  <button class="overlay-open-btn btn" id="open-structure">Structure</button>
 
+  <!-- Timer moved to top -->
+  <div class="timer-large" aria-label="timer controls">
+    <div class="label">Time Remaining</div>
+    <div id="countdown" class="countdown-large">10:00</div>
+
+    <div class="controls" role="toolbar" aria-label="timer buttons">
+      <button id="start-btn" class="btn primary">Start</button>
+      <button id="pause-btn" class="btn">Pause</button>
+      <button id="restart-btn" class="btn">Restart the clock</button>
+      <button id="restart-one-btn" class="btn ghost">Restart the game</button>
+      <button id="fullscreen-btn" class="btn">Enter Fullscreen</button>
+
+  <!-- New zoom buttons -->
+  <button id="zoom-in-btn" class="btn">Zoom In</button>
+  <button id="zoom-out-btn" class="btn">Zoom Out</button>
+</div>
+
+    <div id="status" class="status">Ready</div>
+  </div>
+  
       <div class="left">
         <div>
           <div class="tournament-title">Poker Blinds Timer</div>
@@ -119,22 +167,6 @@
             <div id="next-blinds" class="value">400 / 800</div>
           </div>
         </div>
-      </div>
-
-      <div class="timer-small" aria-label="timer controls">
-        <div style="font-size:12px;color:var(--muted)">Time Remaining</div>
-        <div id="countdown" class="countdown-small">10:00</div>
-
-        <div class="controls" role="toolbar" aria-label="timer buttons">
-          <button id="start-btn" class="btn primary">Start</button>
-          <button id="pause-btn" class="btn">Pause</button>
-          <button id="restart-btn" class="btn">Restart the clock</button>
-          <button id="restart-one-btn" class="btn ghost">Restart the game</button>
-          <!-- Fullscreen toggle button added -->
-          <button id="fullscreen-btn" class="btn">Enter Fullscreen</button>
-        </div>
-
-        <div id="status" class="status">Ready</div>
       </div>
     </div>
   </div>
@@ -195,6 +227,8 @@
       const pauseBtn = document.getElementById('pause-btn');
       const restartBtn = document.getElementById('restart-btn');
       const restartToOneBtn = document.getElementById('restart-one-btn');
+      const zoomInBtn = document.getElementById('zoom-in-btn');
+      const zoomOutBtn = document.getElementById('zoom-out-btn');
 
       // Fullscreen elements
       const fsBtn = document.getElementById('fullscreen-btn');
@@ -224,7 +258,7 @@
         return audioCtx;
       }
 
-      function playBeepOnce(duration = 0.12, frequency = 1200, type = 'sine', volume = 2.5){
+      function playBeepOnce(duration = 0.12, frequency = 1200, type = 'sine', volume = 0.18){
         const ctx = ensureAudioContext();
         if(!ctx) return;
         const now = ctx.currentTime;
@@ -497,6 +531,26 @@
       document.addEventListener('webkitfullscreenchange', onFullscreenChange);
       document.addEventListener('MSFullscreenChange', onFullscreenChange);
 
+// Zoom controls
+let baseSize = 64;          // your normal "1x" size
+let currentSize = baseSize * 2; // start at 5x zoom
+
+// apply the initial zoom immediately
+countdownEl.style.fontSize = currentSize + 'px';
+
+zoomInBtn.addEventListener('click', () => {
+  currentSize += 8;
+  countdownEl.style.fontSize = currentSize + 'px';
+});
+
+zoomOutBtn.addEventListener('click', () => {
+  if (currentSize > 24) {
+    currentSize -= 8;
+    countdownEl.style.fontSize = currentSize + 'px';
+  }
+});
+
+
       // Init defaults
       function initDefaults(){
         rows = [
@@ -506,8 +560,8 @@
           createRowObj('level','4','150/300',10),
           createRowObj('level','5','200/400',10),
           createRowObj('level','6','400/800',10),
-          createRowObj('level','7','600/1200',10),
-          createRowObj('level','8','800/1600',10),
+          createRowObj('level','7','500/1000',10),
+          createRowObj('level','8','750/1500',10),
           createRowObj('level','9','1000/2000',10),
           createRowObj('level','10','1250/2500',10)
         ];
@@ -524,4 +578,3 @@
   </script>
 </body>
 </html>
-
